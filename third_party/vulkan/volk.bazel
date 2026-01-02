@@ -1,0 +1,6 @@
+cc_library(
+    name = "volk",
+    srcs = ["volk.c", "volk.h"],
+    deps = ["@vulkan_headers_archive//:headers"],
+    visibility = ["//visibility:public"],
+)

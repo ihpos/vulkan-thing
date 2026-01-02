@@ -1,0 +1,5 @@
+alias(
+    name = "volk",
+    actual = "@vulkan//:volk",
+    visibility = ["//visibility:public"],
+)

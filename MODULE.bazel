@@ -1,0 +1,10 @@
+module(name = "mcs")
+
+bazel_dep(name = "third_party")
+
+local_path_override(
+    module_name = "third_party",
+    path = "third_party",
+)
+
+use_repo(use_extension("@third_party//:repositories.bzl", "deps"), "vulkan")
