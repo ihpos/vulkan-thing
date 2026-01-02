@@ -1,0 +1,124 @@
+GLOBAL_HDRS = [
+    "src/internal.h",
+    "src/platform.h",
+    "src/mappings.h",
+    "src/null_platform.h",
+    "src/null_joystick.h",
+]
+
+WIN32_HDRS = [
+    "src/win32_time.h",
+    "src/win32_thread.h",
+    "src/win32_platform.h",
+    "src/win32_joystick.h",
+]
+
+POSIX_HDRS = ["src/posix_thread.h"]
+
+COCOA_HDRS = [
+    "src/cocoa_time.h",
+    "src/cocoa_platform.h",
+    "src/cocoa_joystick.h",
+]
+
+OTHER_POSIX_HDRS = [
+    "src/posix_time.h",
+    "src/posix_poll.h"
+]
+
+LINUX_JOYSTICK_HDRS = ["src/linux_joystick.h"]
+
+WAYLAND_HDRS = ["wl_platform.h"]
+
+X11_HDRS = [
+    "src/x11_platform.h",
+    "src/xkb_unicode.h",
+]
+
+GLOBAL_SRCS = [
+    "src/context.c",
+    "src/init.c",
+    "src/input.c",
+    "src/monitor.c",
+    "src/platform.c",
+    "src/vulkan.c",
+    "src/window.c",
+    "src/egl_context.c",
+    "src/osmesa_context.c",
+    "src/null_init.c",
+    "src/null_monitor.c",
+    "src/null_window.c",
+    "src/null_joystick.c",
+]
+
+WIN32_SRCS = [
+    "src/win32_module.c",
+    "src/win32_time.c",
+    "src/win32_thread.c",
+    "src/win32_init.c",
+    "src/win32_joystick.c",
+    "src/win32_monitor.c",
+    "src/win32_window.c",
+    "src/wgl_context.c",
+]
+
+POSIX_SRCS = [
+    "src/posix_module.c",
+    "src/posix_thread.c",
+]
+
+COCOA_SRCS_C = ["src/cocoa_time.c"]
+
+COCOA_SRCS_M = [
+    "src/cocoa_init.m",
+    "src/cocoa_joystick.m",
+    "src/cocoa_monitor.m",
+    "src/cocoa_window.m",
+    "src/nsgl_context.m",
+]
+
+OTHER_POSIX_SRCS = [
+    "src/posix_time.c",
+    "src/posix_poll.c",
+]
+
+LINUX_JOYSTICK_SRCS = ["src/linux_joystick.c"]
+
+WAYLAND_SRCS = [
+    "src/wl_init.c",
+    "src/wl_monitor.c",
+    "src/wl_window.c",
+]
+
+X11_SRCS = [
+    "src/x11_init.c",
+    "src/x11_monitor.c",
+    "src/x11_window.c",
+    "src/xkb_unicode.c",
+    "src/glx_context.c",
+]
+
+objc_library(
+    name = "glfw_objc",
+    srcs = COCOA_SRCS_M + GLOBAL_HDRS + POSIX_HDRS + COCOA_HDRS,
+)
+
+cc_library(
+    name = "glfw",
+    srcs = GLOBAL_SRCS + GLOBAL_HDRS + select({
+        "@platforms//os:windows": WIN32_SRCS + WIN32_HDRS,
+        "@platforms//os:osx": COCOA_SRCS_C + COCOA_HDRS + POSIX_SRCS + POSIX_HDRS,
+        "@platforms//os:linux": POSIX_SRCS + POSIX_HDRS + OTHER_POSIX_SRCS + OTHER_POSIX_HDRS + X11_SRCS + X11_HDRS + WAYLAND_SRCS + WAYLAND_HDRS + LINUX_JOYSTICK_SRCS + LINUX_JOYSTICK_HDRS,
+        "//conditions:default": POSIX_SRCS + POSIX_HDRS + OTHER_POSIX_SRCS + OTHER_POSIX_HDRS + X11_SRCS + X11_HDRS + WAYLAND_SRCS + WAYLAND_HDRS,
+    }),
+    hdrs = ["include/GLFW/glfw3.h", "include/GLFW/glfw3native.h"],
+    deps = select({"@platforms//os:osx": [":glfw_objc"], "//conditions:default": []}),
+    defines = select({
+        "@platforms//os:windows": ["_GLFW_WIN32"],
+        "@platforms//os:osx": ["_GLFW_COCOA"],
+        "@platforms//os:linux": ["_GLFW_X11", "_GLFW_WAYLAND"],
+        "//conditions:default": [],
+    }),
+    includes = ["include"],
+    visibility = ["//visibility:public"],
+)

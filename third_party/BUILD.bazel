@@ -1,4 +1,16 @@
 alias(
+    name = "glm",
+    actual = "@glm//:glm",
+    visibility = ["//visibility:public"],
+)
+
+alias(
+    name = "glfw",
+    actual = "@glfw//:glfw",
+    visibility = ["//visibility:public"],
+)
+
+alias(
     name = "volk",
     actual = "@vulkan//:volk",
     visibility = ["//visibility:public"],

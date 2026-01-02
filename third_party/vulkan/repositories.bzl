@@ -13,12 +13,12 @@ def _deps_impl(module_ctx):
         build_file = ":vulkan_headers.BUILD",
     )
 
-    http_archive(
-        name = "vulkan_loader_archive",
-        url = "https://github.com/KhronosGroup/Vulkan-Loader/archive/refs/tags/vulkan-sdk-{}.0.zip".format(VULKAN_SDK_VERSION),
-        strip_prefix = "Vulkan-Loader-vulkan-sdk-{}.0".format(VULKAN_SDK_VERSION),
-        build_file = ":vulkan_loader.BUILD"
-    )
+    # http_archive(
+    #     name = "vulkan_loader_archive",
+    #     url = "https://github.com/KhronosGroup/Vulkan-Loader/archive/refs/tags/vulkan-sdk-{}.0.zip".format(VULKAN_SDK_VERSION),
+    #     strip_prefix = "Vulkan-Loader-vulkan-sdk-{}.0".format(VULKAN_SDK_VERSION),
+    #     build_file = ":vulkan_loader.BUILD"
+    # )
 
     http_archive(
         name = "volk",

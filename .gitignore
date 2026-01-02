@@ -1,1 +1,3 @@
 .clwb
+bazel-*
+MODULE.bazel.lock

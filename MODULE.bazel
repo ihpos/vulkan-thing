@@ -7,4 +7,4 @@ local_path_override(
     path = "third_party",
 )
 
-use_repo(use_extension("@third_party//:repositories.bzl", "deps"), "vulkan")
+use_repo(use_extension("@third_party//:repositories.bzl", "deps"), "glfw", "glm", "vulkan")
