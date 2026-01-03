@@ -1,6 +1,8 @@
 cc_library(
     name = "volk",
-    srcs = ["volk.c", "volk.h"],
+    srcs = ["volk.c"],
+    hdrs = ["volk.h"],
+    include_prefix = "volk",
     deps = ["@vulkan_headers_archive//:headers"],
     visibility = ["//visibility:public"],
 )

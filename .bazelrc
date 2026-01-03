@@ -1,0 +1,2 @@
+build --experimental_cpp_modules
+build --copt=/std:c++20

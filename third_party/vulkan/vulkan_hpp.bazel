@@ -1,0 +1,13 @@
+cc_library(
+    name = "hpp",
+    hdrs = glob(["vulkan/*.hpp"], exclude = ["vulkan/vulkan-video.hpp"]),
+    module_interfaces = ["vulkan/vulkan.cppm"],
+    features = ["cpp_modules"],
+    includes = ["vulkan"],
+    copts = select({
+        "@platforms//os:windows": [],
+        "@platforms//os:macos": [],
+        "//conditions:default": [],
+    }),
+    visibility = ["//visibility:public"],
+)

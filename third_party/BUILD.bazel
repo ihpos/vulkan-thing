@@ -15,3 +15,9 @@ alias(
     actual = "@vulkan//:volk",
     visibility = ["//visibility:public"],
 )
+
+alias(
+    name = "vulkan_hpp",
+    actual = "@vulkan//:vulkan_hpp",
+    visibility = ["//visibility:public"],
+)

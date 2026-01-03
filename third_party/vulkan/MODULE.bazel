@@ -1,1 +1,2 @@
-use_repo(use_extension(":repositories.bzl", "deps"), "vulkan_headers_archive", "volk")
+bazel_dep(name = "platforms", version = "1.0.0")
+use_repo(use_extension(":repositories.bzl", "deps"), "vulkan_headers_archive", "vulkan_hpp_headers_archive", "volk")

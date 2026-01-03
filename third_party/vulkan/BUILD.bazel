@@ -3,3 +3,9 @@ alias(
     actual = "@volk//:volk",
     visibility = ["//visibility:public"],
 )
+
+alias(
+    name = "vulkan_hpp",
+    actual = "@vulkan_hpp_headers_archive//:hpp",
+    visibility = ["//visibility:public"],
+)

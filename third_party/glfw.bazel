@@ -112,11 +112,21 @@ cc_library(
         "//conditions:default": POSIX_SRCS + POSIX_HDRS + OTHER_POSIX_SRCS + OTHER_POSIX_HDRS + X11_SRCS + X11_HDRS + WAYLAND_SRCS + WAYLAND_HDRS,
     }),
     hdrs = ["include/GLFW/glfw3.h", "include/GLFW/glfw3native.h"],
+    strip_include_prefix = "include",
     deps = select({"@platforms//os:osx": [":glfw_objc"], "//conditions:default": []}),
     defines = select({
         "@platforms//os:windows": ["_GLFW_WIN32"],
         "@platforms//os:osx": ["_GLFW_COCOA"],
         "@platforms//os:linux": ["_GLFW_X11", "_GLFW_WAYLAND"],
+        "//conditions:default": [],
+    }),
+    linkopts = select({  # TODO follow the Correct Way To Do Things™
+        "@platforms//os:windows": [
+            "user32.lib",
+            "shell32.lib",
+            "gdi32.lib",
+        ],
+        "@platforms//os:macos": [],
         "//conditions:default": [],
     }),
     includes = ["include"],

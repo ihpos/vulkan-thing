@@ -4,4 +4,4 @@ bazel_dep(name = "platforms", version = "1.0.0")
 bazel_dep(name = "apple_support", version = "2.0.0", repo_name = "build_bazel_apple_support")
 
 use_repo(use_extension(":repositories.bzl", "deps"), "glfw", "glm", "vulkan")
-use_repo(use_extension("@third_party//vulkan:repositories.bzl", "deps"), "vulkan_headers_archive", "volk")
+use_repo(use_extension("@third_party//vulkan:repositories.bzl", "deps"), "vulkan_headers_archive", "vulkan_hpp_headers_archive", "volk")

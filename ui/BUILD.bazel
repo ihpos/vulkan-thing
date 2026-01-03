@@ -1,0 +1,15 @@
+cc_binary(
+    name = "ui",
+    srcs = ["ui.cpp", "ui.hpp"],
+    deps = [
+        "@third_party//:volk",
+        "@third_party//:vulkan_hpp",
+        "@third_party//:glfw",
+        "@third_party//:glm",
+    ],
+    copts = select({
+        "@platforms//os:windows": [],
+        "@platforms//os:macos": [],
+        "//conditions:default": [],
+    }),
+)
