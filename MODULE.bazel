@@ -1,4 +1,14 @@
 bazel_dep(name = "platforms", version = "1.0.0")
+
+bazel_dep(name = "rules_cc")
+
+local_path_override(
+    module_name = "rules_cc",
+    path = "rules_cc",
+)
+
+use_repo(use_extension("@rules_cc//cc:extensions.bzl", "cc_configure_extension"), "local_config_cc")
+
 bazel_dep(name = "third_party")
 
 local_path_override(

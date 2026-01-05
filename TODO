@@ -1,0 +1,18 @@
+High Priority
+
+[ ]
+
+Low Priority
+
+[ ] Move to modules (both std and vulkan)
+    [ ] Requires LLVM toolchain
+        [ ] toolchains_llvm_bootstrapped?
+            [ ] Wait for *-windows-msvc support
+        [X] BAZEL_LLVM (temporary)
+    [ ] Consider Xmake? (https://arewemodulesyet.org/tools/)
+        [ ] Find something like Nix that's not Nix
+
+Future
+
+[ ] Reduce dependencies
+    [ ] Custom Vulkan loader

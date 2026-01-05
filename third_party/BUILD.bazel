@@ -17,7 +17,7 @@ alias(
 )
 
 alias(
-    name = "vulkan_hpp",
-    actual = "@vulkan//:vulkan_hpp",
+    name = "vulkan_module",
+    actual = "@vulkan//:vulkan_module",
     visibility = ["//visibility:public"],
 )

@@ -1,3 +1,6 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:objc_library.bzl", "objc_library")
+
 GLOBAL_HDRS = [
     "src/internal.h",
     "src/platform.h",
@@ -23,7 +26,7 @@ COCOA_HDRS = [
 
 OTHER_POSIX_HDRS = [
     "src/posix_time.h",
-    "src/posix_poll.h"
+    "src/posix_poll.h",
 ]
 
 LINUX_JOYSTICK_HDRS = ["src/linux_joystick.h"]
@@ -120,7 +123,8 @@ cc_library(
         "@platforms//os:linux": ["_GLFW_X11", "_GLFW_WAYLAND"],
         "//conditions:default": [],
     }),
-    linkopts = select({  # TODO follow the Correct Way To Do Things™
+    linkopts = select({
+        # TODO follow the Correct Way To Do Things™
         "@platforms//os:windows": [
             "user32.lib",
             "shell32.lib",

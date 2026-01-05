@@ -1,5 +1,14 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
 cc_library(
     name = "glm",
     hdrs = glob(["glm/**/*.h", "glm/**/*.hpp"]),
     visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "mod",
+    module_interfaces = ["glm/glm.cppm"],
+    deps = [":glm"],
+    features = ["cpp_modules"],
 )

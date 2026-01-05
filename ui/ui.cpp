@@ -1,19 +1,7 @@
 #include <algorithm>
 #include <cstdlib>
-#include <iostream>
 #include <memory>
 #include <stdexcept>
-
-#define VK_NO_PROTOTYPES
-#include <volk/volk.h>
-#undef VK_NO_PROTOTYPES
-
-#define VULKAN_HPP_NO_STRUCT_CONSTRUCTORS
-#include <vulkan/vulkan_raii.hpp>
-// import vulkan;  // Needs a working LLVM toolchain (this is Bazel's fault, not MSVC's)
-
-#define GLFW_INCLUDE_VULKAN
-#include <GLFW/glfw3.h>
 
 #include "ui.hpp"
 
@@ -23,46 +11,37 @@ constexpr bool ndebug = true;
 constexpr bool ndebug = false;
 #endif
 
-const std::vector<char const*> validationLayers = { "VK_LAYER_KHRONOS_validation" };
+namespace ui {
+    constexpr vk::ApplicationInfo appInfo{
+        .pApplicationName   = "Hello Vulkan",
+        .applicationVersion = VK_MAKE_VERSION(1, 0, 0),
+        .pEngineName        = "No Engine",
+        .engineVersion      = VK_MAKE_VERSION(1, 0, 0),
+        .apiVersion         = vk::ApiVersion14
+    };
 
-bool init() {
-    if (!glfwInit()) { return false; }
-    if (!glfwVulkanSupported()) { return false; }
-    if (volkInitialize() != VK_SUCCESS) { return false; }
-    return true;
-}
+    const std::vector<char const*> validationLayers = { "VK_LAYER_KHRONOS_validation" };
 
-void cleanup() {
-    glfwTerminate();
-}
+    bool init() {
+        if (!glfwInit()) { return false; }
+        if (!glfwVulkanSupported()) { return false; }
+        if (volkInitialize() != VK_SUCCESS) { return false; }
+        return true;
+    }
 
-class Window {
-    GLFWwindow* window = nullptr;
-    vk::raii::Context context;
-    vk::raii::Instance instance = nullptr;
-    constexpr static int WIDTH = 800;
-    constexpr static int HEIGHT = 600;
+    void cleanup() {
+        glfwTerminate();
+        volkFinalize();
+    }
 
-public:
-    Window() {
+    Window::Window() {
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-		window = glfwCreateWindow(WIDTH, HEIGHT, "Vulkan", nullptr, nullptr);
-        
-        constexpr vk::ApplicationInfo appInfo{
-            .pApplicationName   = "Hello Vulkan",
-            .applicationVersion = VK_MAKE_VERSION(1, 0, 0),
-            .pEngineName        = "No Engine",
-            .engineVersion      = VK_MAKE_VERSION(1, 0, 0),
-            .apiVersion         = vk::ApiVersion14
-        };
+        glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+        window = glfwCreateWindow(WIDTH, HEIGHT, "Vulkan", nullptr, nullptr);
 
-        std::vector<char const*> requiredLayers;
         if (!ndebug) {
-            requiredLayers.assign(validationLayers.begin(), validationLayers.end());
-
             auto layerProperties = context.enumerateInstanceLayerProperties();
-            if (std::ranges::any_of(requiredLayers, [&layerProperties](auto const& requiredLayer) {
+            if (std::ranges::any_of(validationLayers, [&layerProperties](auto const& requiredLayer) {
                 return std::ranges::none_of(layerProperties,
                                            [requiredLayer](auto const& layerProperty)
                                            { return strcmp(layerProperty.layerName, requiredLayer) == 0; });
@@ -74,50 +53,36 @@ public:
 
         uint32_t glfwExtensionCount = 0;
         auto     glfwExtensions     = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
-        
+
         auto extensionProperties = context.enumerateInstanceExtensionProperties();
         for (uint32_t i = 0; i < glfwExtensionCount; ++i) {
             if (std::ranges::none_of(extensionProperties, [glfwExtension = glfwExtensions[i]](auto const &extensionProperty) { return strcmp(extensionProperty.extensionName, glfwExtension) == 0; })) {
                 throw std::runtime_error("Required GLFW extension not supported: " + std::string(glfwExtensions[i]));
             }
         }
-        
+
         vk::InstanceCreateInfo createInfo {
             .pApplicationInfo        = &appInfo,
+#ifndef NDEBUG
+            .enabledLayerCount       = static_cast<uint32_t>(validationLayers.size()),
+            .ppEnabledLayerNames     = validationLayers.data(),
+#endif
             .enabledExtensionCount   = glfwExtensionCount,
             .ppEnabledExtensionNames = glfwExtensions
         };
-        
+
         instance = vk::raii::Instance(context, createInfo);
     }
 
-    [[nodiscard]] bool initialized() const { return instance != nullptr; }
+    bool Window::initialized() const { return instance != nullptr; }
 
-    void run() {
+    void Window::run() {
         while (!glfwWindowShouldClose(window)) {
             glfwPollEvents();
         }
     }
 
-    ~Window() {
+    Window::~Window() {
         glfwDestroyWindow(window);
     }
-};
-    
-int main() {
-    if (!ndebug) { std::cerr << "[N] Debug build!" << std::endl; }
-    if (!init()) {
-        std::cerr << ":(  Failed to init" << std::endl;
-        return EXIT_FAILURE;
-    }
-    auto* window = new Window();
-    if (!window->initialized()) {
-        std::cerr << ":(  Failed to init window" << std::endl;
-        return EXIT_FAILURE;
-    }
-    window->run();
-    delete window;
-    cleanup();
-    std::cout << "Bye!" << std::endl;
-    return EXIT_SUCCESS;
 }

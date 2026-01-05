@@ -1,15 +1,39 @@
-cc_binary(
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
+cc_library(
     name = "ui",
-    srcs = ["ui.cpp", "ui.hpp"],
-    deps = [
-        "@third_party//:volk",
-        "@third_party//:vulkan_hpp",
-        "@third_party//:glfw",
-        "@third_party//:glm",
-    ],
+    srcs = glob(
+        [
+            "**/*.c",
+            "**/*.cpp",
+            "**/*.h",
+            "**/*.hpp",
+        ],
+        allow_empty = True,
+        exclude = [
+            "include/**/*.h",
+            "include/**/*.hpp",
+        ],
+    ),
+    hdrs = glob(
+        [
+            "include/**/*.h",
+            "include/**/*.hpp",
+        ],
+        allow_empty = True,
+    ),
     copts = select({
         "@platforms//os:windows": [],
         "@platforms//os:macos": [],
         "//conditions:default": [],
     }),
+    include_prefix = "ui",
+    strip_include_prefix = "include",
+    visibility = ["//visibility:public"],
+    deps = [
+        "@third_party//:glfw",
+        "@third_party//:glm",
+        "@third_party//:volk",
+        "@third_party//:vulkan_module",
+    ],
 )
