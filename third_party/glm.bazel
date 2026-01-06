@@ -6,9 +6,9 @@ cc_library(
     visibility = ["//visibility:public"],
 )
 
-cc_library(
-    name = "mod",
-    module_interfaces = ["glm/glm.cppm"],
-    deps = [":glm"],
-    features = ["cpp_modules"],
-)
+# cc_library(
+#     name = "mod",
+#     module_interfaces = ["glm/glm.cppm"],
+#     deps = [":glm"],
+#     features = ["cpp_modules"],
+# )

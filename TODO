@@ -8,7 +8,7 @@ Low Priority
     [ ] Requires LLVM toolchain
         [ ] toolchains_llvm_bootstrapped?
             [ ] Wait for *-windows-msvc support
-        [X] BAZEL_LLVM (temporary)
+        [ ] BAZEL_LLVM (temporary)
     [ ] Consider Xmake? (https://arewemodulesyet.org/tools/)
         [ ] Find something like Nix that's not Nix
 
