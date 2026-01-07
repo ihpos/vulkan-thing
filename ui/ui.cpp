@@ -11,7 +11,7 @@ constexpr bool ndebug = true;
 constexpr bool ndebug = false;
 #endif
 
-namespace ui;
+namespace ui {
 
 constexpr vk::ApplicationInfo appInfo{
     .pApplicationName   = "Hello Vulkan",
@@ -29,6 +29,47 @@ bool init() {
     if (!glfwInit()) { return false; }
     if (!glfwVulkanSupported()) { return false; }
     if (volkInitialize() != VK_SUCCESS) { return false; }
+
+    if (!ndebug) {
+        auto layerProperties = context.enumerateInstanceLayerProperties();
+        if (std::ranges::any_of(validationLayers, [&layerProperties](auto const& requiredLayer) {
+            return std::ranges::none_of(layerProperties,
+                                        [requiredLayer](auto const& layerProperty)
+                                        { return strcmp(layerProperty.layerName, requiredLayer) == 0; });
+        }))
+        {
+            throw std::runtime_error("One or more required layers are not supported!");
+        }
+    }
+
+    uint32_t glfwExtensionCount = 0;
+    auto     glfwExtensions     = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+
+    std::vector<const char*> deviceExtensions = {
+        vk::KHRSwapchainExtensionName,
+        vk::KHRSpirv14ExtensionName,
+        vk::KHRSynchronization2ExtensionName,
+        vk::KHRCreateRenderpass2ExtensionName
+    };
+
+    auto extensionProperties = context.enumerateInstanceExtensionProperties();
+    for (uint32_t i = 0; i < glfwExtensionCount; ++i) {
+        if (std::ranges::none_of(extensionProperties, [glfwExtension = glfwExtensions[i]](auto const &extensionProperty) { return strcmp(extensionProperty.extensionName, glfwExtension) == 0; })) {
+            throw std::runtime_error("Required GLFW extension not supported: " + std::string(glfwExtensions[i]));
+        }
+    }
+
+    vk::InstanceCreateInfo createInfo {
+        .pApplicationInfo        = &appInfo,
+#ifndef NDEBUG
+        .enabledLayerCount       = static_cast<uint32_t>(validationLayers.size()),
+        .ppEnabledLayerNames     = validationLayers.data(),
+#endif
+        .enabledExtensionCount   = glfwExtensionCount,
+        .ppEnabledExtensionNames = glfwExtensions
+    };
+
+    instance = vk::raii::Instance(context, createInfo);
     
     auto devices = instance.enumeratePhysicalDevices();
     
@@ -72,40 +113,6 @@ Window::Window() {
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
     window = glfwCreateWindow(WIDTH, HEIGHT, "Vulkan", nullptr, nullptr);
-
-    if (!ndebug) {
-        auto layerProperties = context.enumerateInstanceLayerProperties();
-        if (std::ranges::any_of(validationLayers, [&layerProperties](auto const& requiredLayer) {
-            return std::ranges::none_of(layerProperties,
-                                        [requiredLayer](auto const& layerProperty)
-                                        { return strcmp(layerProperty.layerName, requiredLayer) == 0; });
-        }))
-        {
-            throw std::runtime_error("One or more required layers are not supported!");
-        }
-    }
-
-    uint32_t glfwExtensionCount = 0;
-    auto     glfwExtensions     = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
-
-    auto extensionProperties = context.enumerateInstanceExtensionProperties();
-    for (uint32_t i = 0; i < glfwExtensionCount; ++i) {
-        if (std::ranges::none_of(extensionProperties, [glfwExtension = glfwExtensions[i]](auto const &extensionProperty) { return strcmp(extensionProperty.extensionName, glfwExtension) == 0; })) {
-            throw std::runtime_error("Required GLFW extension not supported: " + std::string(glfwExtensions[i]));
-        }
-    }
-
-    vk::InstanceCreateInfo createInfo {
-        .pApplicationInfo        = &appInfo,
-#ifndef NDEBUG
-        .enabledLayerCount       = static_cast<uint32_t>(validationLayers.size()),
-        .ppEnabledLayerNames     = validationLayers.data(),
-#endif
-        .enabledExtensionCount   = glfwExtensionCount,
-        .ppEnabledExtensionNames = glfwExtensions
-    };
-
-    instance = vk::raii::Instance(context, createInfo);
 }
 
 bool Window::initialized() const { return instance != nullptr; }
@@ -118,4 +125,6 @@ void Window::run() {
 
 Window::~Window() {
     glfwDestroyWindow(window);
+}
+
 }
